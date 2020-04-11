@@ -1,0 +1,47 @@
+<title>登录</title>
+<template>
+    <div class="container" style="max-width: 450px;">
+        <div class="card mt-4">
+            <div class="card-body">
+                <form id="login_form" method="post" class="form-signin">
+                    <h2 id="site_name">Eira</h2>
+                    <div id="alert_container"></div>
+                    <div class="form-group">
+                        <label for="username">账号</label>
+                        <input type="text" id="username" name="username" class="form-control" placeholder="用户名/邮箱"
+                               required
+                               autofocus>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">密码</label>
+                        <input type="password" id="password" name="password" class="form-control" placeholder="密码"
+                               required>
+                    </div>
+                    <input type="submit" class="btn btn-success btn-block" value="登录"/>
+                    <div class="float-right"><a role="button" href="#register" class="btn btn-link">注册</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</template>
+<script>
+    (function () {
+        $('#site_name').html($.Eira.data('siteName'));
+        $('#login_form').submit(function () {
+            $(this).ajaxSubmit({
+                url: $.Eira.data('apiUrl') + 'api/user/login',
+                dataType: 'json',
+                success: function (res) {
+                    if (res.status !== 0) {
+                        Utils.showAlert('#alert_container', res.msg, 'danger', true);
+                    } else {
+                        $.Eira.storage('user', res.data);
+                        $.Eira.navigate('index')
+                    }
+                }
+            });
+            return false;
+        });
+    })();
+</script>
