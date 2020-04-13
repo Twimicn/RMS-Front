@@ -1,0 +1,71 @@
+<template>
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3">
+        <h1 class="h2" page-id="title"></h1>
+        <div class="btn-toolbar mb-2 mb-md-0">
+            <div class="btn-group mr-2">
+                <a class="btn btn-sm btn-outline-info">添加</a>
+                <a class="btn btn-sm btn-outline-danger">删除</a>
+            </div>
+        </div>
+    </div>
+    <div class="table-responsive">
+        <table class="table table-striped table-sm text-nowrap">
+            <thead>
+            <tr>
+
+            </tr>
+            </thead>
+            <tbody>
+
+            </tbody>
+        </table>
+        当前页:1 <a role="button" class="btn btn-sm btn-info" href="">下一页</a>
+    </div>
+</template>
+<script>
+    (function () {
+        var Table = Widget.extend({
+            init: function ($elem, conf) {
+                this.$elem = $elem;
+                $elem.find('[page-id="title"]').text(conf.title || '无标题');
+                this.mod = conf.mod;
+                this.curPage = conf.curPage || 1;
+                this.columns = conf.columns || [];
+            },
+            created: function () {
+                this.configTable();
+                this.loadTable();
+            },
+            configTable: function () {
+                var htr = this.$elem.find('table thead tr');
+                htr.html('<th></th>');
+                for (var i = 0; i < this.columns.length; i++) {
+                    htr.append('<th>' + this.columns[i].text + '</th>');
+                }
+            },
+            loadTable: function () {
+                var $elem = this.$elem;
+                var columns = this.columns;
+                var tb = $elem.find('table tbody');
+                tb.empty();
+                Utils.apiPost('api/' + this.mod + '/list', {}).done(function (res) {
+                    var dataList = res.data;
+                    for (var i = 0; i < dataList.length; i++) {
+                        var tr = '<tr><td><label><input type="checkbox" name="id[]"></label></td>';
+                        for (var j = 0; j < columns.length; j++) {
+                            if (typeof columns[j].tpl === 'function') {
+                                tr += '<td>' + columns[j].tpl(dataList[i]) + '</td>'
+                            } else {
+                                tr += '<td>' + dataList[i][columns[j].column] + '</td>'
+                            }
+                        }
+                        tr += '</tr>';
+                        tb.append(tr);
+                    }
+                });
+            },
+        });
+
+        $.Eira.defineWidget('table', Table);
+    })();
+</script>
