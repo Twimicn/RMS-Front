@@ -11,9 +11,13 @@
     }
 
     function Dialog(id, conf) {
-        var $dialog = $('<div class="modal" id="dialog_' + id + '" tabindex="-1" role="dialog"></div>');
-        $('body').append($dialog);
-        $dialog.html('<div class="modal-dialog" role="document"><div class="modal-content"></div></div>');
+        conf = conf || {};
+        var $dialog = $('#dialog_' + id);
+        if ($dialog.length === 0) {
+            $dialog = $('<div class="modal" id="dialog_' + id + '" tabindex="-1"' + (conf.staticBack ? ' data-backdrop="static"' : '') + ' role="dialog"></div>')
+            $('body').append($dialog);
+        }
+        $dialog.html('<div class="modal-dialog' + (conf.center ? ' modal-dialog-centered' : '') + '" role="document"><div class="modal-content"></div></div>');
         var $content = $dialog.find('.modal-content');
         if (conf.header) {
             var header = '<div class="modal-header"><h5 class="modal-title">' + (conf.header.title || '') + '</h5>';
@@ -81,6 +85,21 @@
         return dialog;
     }
 
+    function loadingBox(msg, color) {
+        color = color || 'primary';
+        var html = '<div class="text-center mt-3"><div class="spinner-border text-' + color + '" role="status"><span class="sr-only">Loading...</span></div></div>';
+        if (msg) {
+            html += '<div class="text-center mt-3">' + msg + '</div>';
+        }
+        var dialog = new Dialog('loading', {
+            staticBack: true,
+            center: true,
+            body: html,
+        });
+        dialog.show();
+        return dialog;
+    }
+
     function checkLogin() {
         if ($.Eira.storage('user').token) {
             return true;
@@ -110,6 +129,7 @@
     W.Utils = {
         showAlert: showAlert,
         messageBox: messageBox,
+        loadingBox: loadingBox,
         tipBox: tipBox,
         createDialog: createDialog,
         checkLogin: checkLogin,
