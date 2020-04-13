@@ -20,16 +20,10 @@
     </nav>
     <div class="container-fluid">
         <div class="row">
-            <nav class="col-md-2 d-none d-md-block bg-light sidebar">
+            <nav class="col-md-2 d-none d-md-block bg-light sidebar" id="left_nav">
                 <div class="sidebar-sticky">
                     <ul class="nav flex-column">
-                        <li class="nav-item">
-                            <a class="nav-link active" href="#?mod=index">首页</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link "
-                               href="#">测试内容管理</a>
-                        </li>
+
                     </ul>
                 </div>
             </nav>
@@ -97,20 +91,33 @@
     }
 
     [role="main"] {
-        padding-top: 48px;
+        padding-top: 60px;
     }
 </style>
 <script>
-    (function () {
+    $.Eira.loadWidget('table', function () {
         if (!Utils.checkLogin()) return;
         $('#nav_site_name').text($.Eira.data('siteName'));
         var user = $.Eira.storage('user');
         if (user.token) {
             $('#nav_user').text(user.username);
         }
+        var navs = $.Eira.data('leftNav');
+        var leftNav = $('#left_nav ul');
+        leftNav.empty();
+        for (var i = 0; i < navs.length; i++) {
+            var href = navs[i].link ? navs[i].link : ('#?mod=' + navs[i].mod);
+            leftNav.append('<li class="nav-item"><a class="nav-link' + (i === 0 ? ' active' : '') + '" href="' + href + '" data-mod="' + navs[i].mod + '">' + navs[i].title + '</a></li>')
+        }
+
+        function changeNav(mod) {
+            $('#left_nav .nav-link.active').removeClass('active');
+            $('#left_nav').find('.nav-link[data-mod="' + mod + '"]').addClass('active');
+        }
 
         function loadBlock(pageInfo) {
             var mod = pageInfo.query.mod || 'index';
+            changeNav(mod);
             var action = pageInfo.query.action || 'index';
             if (mod) {
                 $.Eira.render($('[role="main"]'), '/' + mod + '/' + action);
@@ -122,5 +129,5 @@
         });
 
         loadBlock($.Eira.router());
-    })();
+    });
 </script>
