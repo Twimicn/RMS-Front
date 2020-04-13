@@ -27,7 +27,7 @@
     (function () {
         $('#site_name').html($.Eira.data('siteName'));
         $('#login_form').submit(function () {
-            var tipBox = Utils.tipBox('登录中...<div class="progress"><div class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" style="width: 100%"></div></div>');
+            var tipBox = Utils.loadingBox('登录中...');
             $(this).ajaxSubmit({
                 url: $.Eira.data('apiUrl') + 'api/user/login',
                 dataType: 'json',
