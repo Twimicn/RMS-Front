@@ -55,6 +55,7 @@
     }
 
     function pageCache(view, html) {
+        if (isDebug) return;
         var pk = 'cache#' + view + '@' + pageDir;
         if (typeof html === "undefined") {
             var c = storage(pk);
