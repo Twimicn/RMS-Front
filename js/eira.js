@@ -73,24 +73,48 @@
         }
     }
 
-    function replaceContent(isPage, $el, $pageData, $template) {
-        if (typeof events['unload'] === "function") {
-            events['unload']();
-            delete events['unload'];
+    function autoWidget($el) {
+        var $widgets = $el.find('[auto-widget]');
+        $widgets.each(function () {
+            var $w = $(this);
+            widget($w, $w.attr('auto-widget'), $w.data());
+        });
+    }
+
+    function replaceContent($el, isPage, callback, $pageData, $template) {
+        if (isPage) {
+            if (typeof events['unload'] === "function") {
+                events['unload']();
+                delete events['unload'];
+            }
+            if (events['load']) delete events['load'];
         }
-        if (events['load']) delete events['load'];
+        $el.find('[widget]').each(function () {
+            disposeWidget($(this));
+        });
         $template = $template || $pageData.find('template');
-        $el.html($template.html());
+        $el.empty().html($template.html());
         $el.prepend($pageData.find('style'));
-        $el.append($pageData.find('script'));
+        var $script = $pageData.find('script');
         if (isPage) {
             var title = $pageData.find('title');
             if (title.length > 0) document.title = title.text();
-            if (typeof events['load'] === 'function') events['load']();
+        }
+        if ($script.attr('use-widget')) {
+            var widgetList = $script.attr('use-widget').split(',');
+            loadWidget(widgetList, function () {
+                $el.append($script);
+                autoWidget($el);
+                if (typeof callback === 'function') callback();
+            });
+        } else {
+            $el.append($script);
+            autoWidget($el);
+            if (typeof callback === 'function') callback();
         }
     }
 
-    function replaceBlock(el, view, isPage) {
+    function replaceBlock(el, view, isPage, callback) {
         var $el = $(el);
         if (view[view.length - 1] === '/') {
             view = view + 'index'
@@ -98,7 +122,7 @@
         if (!isDebug) {
             var cacheHeml = pageCache(view);
             if (cacheHeml) {
-                replaceContent(isPage, $el, $('<div>' + cacheHeml + '</div>'));
+                replaceContent($el, isPage, callback, $('<div>' + cacheHeml + '</div>'));
                 return;
             }
         }
@@ -111,7 +135,7 @@
                 var template = pageData.find('template');
                 if (template.length > 0) {
                     pageCache(view, html);
-                    replaceContent(isPage, $el, pageData, template);
+                    replaceContent($el, isPage, callback, pageData, template);
                 } else {
                     $el.html('<h1>404 Not Found</h1>');
                 }
@@ -129,7 +153,9 @@
         } else {
             prevPath = pageInfo.path;
             delete events['change'];
-            replaceBlock(appDiv, pageInfo.path, true);
+            replaceBlock(appDiv, pageInfo.path, true, function () {
+                if (typeof events['load'] === 'function') events['load']();
+            });
         }
     }
 
@@ -151,10 +177,24 @@
         $template = $template || $widgetData.find('template');
         widgets[name].html = $template.html();
         $(document.body).prepend($widgetData.find('style').attr('widget-style', name));
-        $(document.body).append($widgetData.find('script').attr('widget-script', name));
+        var $script = $widgetData.find('script');
+        $script.attr('widget-script', name);
+        if ($script.attr('use-widget')) {
+            var widgetList = $script.attr('use-widget').split(',');
+            loadWidget(widgetList, function () {
+                $(document.body).append($script);
+            });
+        } else {
+            $(document.body).append($script);
+        }
     }
 
     function loadOneWidget(name, callback) {
+        name = name.trim();
+        if (!name || widgets[name]) {
+            if (typeof callback === 'function') callback();
+            return;
+        }
         var widgetPath = widgetDir + '/' + name.split('.').join('/') + ".html";
         var cacheHtml = pageCache(widgetPath);
         if (cacheHtml) {
@@ -200,7 +240,7 @@
     function widget(el, name, param) {
         var $el = $(el);
         if (typeof name === "undefined" && typeof param === "undefined") {
-            return $el.data('pageWidget');
+            return $el.data('widgetHandler');
         }
         if (widgets[name]) {
             var Initializer = widgets[name].initializer;
@@ -216,7 +256,7 @@
             }
             if (typeof Initializer === 'function') {
                 var handler = new Initializer($el, param);
-                $el.data('pageWidget', handler);
+                $el.data('widgetHandler', handler);
                 $el.attr('widget', name);
                 if (typeof handler['created'] === "function") {
                     handler['created']();
@@ -228,13 +268,13 @@
 
     function disposeWidget(el) {
         var $el = $(el);
-        var oldHandler = $el.data('pageWidget');
+        var oldHandler = $el.data('widgetHandler');
         if (oldHandler) {
             if (typeof oldHandler.unload === "function") {
                 oldHandler.unload();
             }
             oldHandler = undefined;
-            $el.removeData('pageWidget');
+            $el.removeData('widgetHandler');
             $el.removeAttr('widget');
             $el.find('[widget]').each(function () {
                 disposeWidget($(this));
@@ -330,8 +370,8 @@
         on: function (evtName, callback) {
             bindEvent(evtName, callback);
         },
-        render: function (el, view) {
-            replaceBlock(el, view);
+        render: function (el, view, callback) {
+            replaceBlock(el, view, false, callback);
         },
         defineWidget: function (name, init) {
             defineWidget(name, init);
