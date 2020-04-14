@@ -1,3 +1,4 @@
+<title>用户管理</title>
 <template>
     <div id="table"></div>
 </template>
@@ -30,6 +31,11 @@
                         return STATE[data.roleId];
                     }
                 },
+            ],
+            rowOp: [
+                {action: 'active', text: '激活', color: 'success'},
+                {action: 'edit', text: '编辑', color: 'info'},
+                {action: 'delete', text: '删除', color: 'danger'},
             ]
         });
     })();

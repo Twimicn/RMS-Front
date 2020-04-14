@@ -3,8 +3,8 @@
         <h1 class="h2" page-id="title"></h1>
         <div class="btn-toolbar mb-2 mb-md-0">
             <div class="btn-group mr-2">
-                <a class="btn btn-sm btn-outline-info">添加</a>
-                <a class="btn btn-sm btn-outline-danger">删除</a>
+                <button type="button" class="btn btn-sm btn-outline-info">添加</button>
+                <button type="button" class="btn btn-sm btn-outline-danger">删除</button>
             </div>
         </div>
     </div>
@@ -31,6 +31,7 @@
                 this.mod = conf.mod;
                 this.curPage = conf.curPage || 1;
                 this.columns = conf.columns || [];
+                this.rowOp = conf.rowOp || [];
             },
             created: function () {
                 this.configTable();
@@ -42,14 +43,25 @@
                 for (var i = 0; i < this.columns.length; i++) {
                     htr.append('<th>' + this.columns[i].text + '</th>');
                 }
+                htr.append('<th>操作</th>');
+                $(this.$elem).on('click', '[data-action]', function () {
+                    var index = $(this).data('index');
+                    var action = $(this).data('action');
+                    if (action === 'delete') {
+                        Utils.messageBox('提示', '是否删除当前项?');
+                    }
+                });
             },
             loadTable: function () {
+                var that = this;
                 var $elem = this.$elem;
                 var columns = this.columns;
+                var rowOp = this.rowOp;
                 var tb = $elem.find('table tbody');
                 tb.empty();
                 Utils.apiPost('api/' + this.mod + '/list', {}).done(function (res) {
                     var dataList = res.data;
+                    that.tableData = dataList;
                     for (var i = 0; i < dataList.length; i++) {
                         var tr = '<tr><td><label><input type="checkbox" name="id[]"></label></td>';
                         for (var j = 0; j < columns.length; j++) {
@@ -59,7 +71,11 @@
                                 tr += '<td>' + dataList[i][columns[j].column] + '</td>'
                             }
                         }
-                        tr += '</tr>';
+                        var ops = '<td><div class="btn-group">';
+                        for (var k = 0; k < rowOp.length; k++) {
+                            ops += ('<button type="button" class="btn btn-sm btn-outline-' + (rowOp[k].color || 'secondary') + '" data-index="' + i + '" data-action="' + rowOp[k].action + '">' + rowOp[k].text + '</button>');
+                        }
+                        tr += ops + '</div></td></tr>';
                         tb.append(tr);
                     }
                 });
