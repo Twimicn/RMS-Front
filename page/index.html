@@ -95,7 +95,7 @@
     }
 </style>
 <script>
-    $.Eira.loadWidget('table', function () {
+    (function () {
         if (!Utils.checkLogin()) return;
         $('#nav_site_name').text($.Eira.data('siteName'));
         var user = $.Eira.storage('user');
@@ -129,5 +129,5 @@
         });
 
         loadBlock($.Eira.router());
-    });
+    })();
 </script>
