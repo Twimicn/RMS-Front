@@ -32,6 +32,9 @@
                     }
                 },
             ],
+            toolbar: [
+                {action: 'add', color: 'success', text: '新增'},
+            ],
             rowOp: [
                 {
                     action: 'active', tpl: function (item) {
@@ -43,7 +46,7 @@
                         } else if (item.state === 1) {
                             return {
                                 text: '禁用',
-                                color: 'danger',
+                                color: 'warning',
                             }
                         }
                     }
@@ -64,7 +67,21 @@
                     }
                     handler.update({state: newState})
                 });
+            } else if (action === 'edit') {
+                $.Eira.navigate('', {
+                    mod: 'user',
+                    action: 'edit',
+                    id: item.id,
+                })
             }
-        })
+        });
+        table.on('toolbar', function (action) {
+            if (action === 'add') {
+                $.Eira.navigate('', {
+                    mod: 'user',
+                    action: 'add',
+                })
+            }
+        });
     })();
 </script>
