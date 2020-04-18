@@ -1,0 +1,24 @@
+<template>
+    <div id="form"></div>
+</template>
+<script use-widget="form">
+    (function () {
+        var form = $.Eira.widget('#form', 'form', {
+            title: '新增用户',
+            mod: 'user',
+            action: 'register',
+            columns: [
+                {column: 'username', text: '用户名'},
+                {column: 'password', text: '密码'},
+                {column: 'email', text: '邮箱'},
+                {column: 'phone', text: '手机'},
+                {
+                    column: 'roleId', text: '用户角色', type: 'select', options: [
+                        {text: '普通用户', value: 0},
+                        {text: '管理员', value: 1},
+                    ]
+                },
+            ],
+        });
+    })();
+</script>
