@@ -12,6 +12,8 @@
 
     function Dialog(id, conf) {
         conf = conf || {};
+        this._events = {};
+        var that = this;
         var $dialog = $('#dialog_' + id);
         if ($dialog.length === 0) {
             $dialog = $('<div class="modal" id="dialog_' + id + '" tabindex="-1"' + (conf.staticBack ? ' data-backdrop="static"' : '') + ' role="dialog"></div>')
@@ -33,14 +35,21 @@
         }
         $content.append(this.$body);
         if (conf.ok !== undefined || conf.cancel !== undefined) {
-            var footer = '<div class="modal-footer">';
+            var footer = $('<div class="modal-footer"></div>');
             if (conf.ok !== undefined) {
-                footer += '<button type="button" class="btn btn-primary">' + conf.ok + '</button>';
+                var $btnOk = $('<button type="button" class="btn btn-primary">' + conf.ok + '</button>');
+                $btnOk.click(function () {
+                    if (typeof that._events['ok'] === 'function') that._events['ok']();
+                });
+                footer.append($btnOk);
             }
             if (conf.cancel !== undefined) {
-                footer += '<button type="button" class="btn btn-secondary" data-dismiss="modal">' + conf.cancel + '</button>';
+                var $btnCancel = $('<button type="button" class="btn btn-secondary" data-dismiss="modal">' + conf.cancel + '</button>');
+                $btnCancel.click(function () {
+                    if (typeof that._events['cancel'] === 'function') that._events['cancel']();
+                });
+                footer.append($btnCancel);
             }
-            footer += '</div>';
             $content.append(footer);
         }
         this.$dialog = $dialog;
@@ -57,6 +66,11 @@
     Dialog.prototype.hide = function () {
         this.$dialog.modal('hide');
         this.$dialog.hide();
+    };
+
+    Dialog.prototype.on = function (evtName, callback) {
+        console.log(evtName, callback);
+        if (typeof callback === 'function') this._events[evtName] = callback;
     };
 
     function createDialog(id, conf) {
@@ -101,9 +115,11 @@
     }
 
     function checkLogin() {
-        if ($.Eira.storage('user').token) {
+        var user = $.Eira.storage('user');
+        if (user.token && (new Date(user.expire) > new Date())) {
             return true;
         } else {
+            $.Eira.storage('user', null);
             $.Eira.navigate('login');
             return false;
         }
