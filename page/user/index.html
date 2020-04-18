@@ -33,10 +33,38 @@
                 },
             ],
             rowOp: [
-                {action: 'active', text: '激活', color: 'success'},
+                {
+                    action: 'active', tpl: function (item) {
+                        if (item.state === 0 || item.state === 2) {
+                            return {
+                                text: '激活',
+                                color: 'success',
+                            }
+                        } else if (item.state === 1) {
+                            return {
+                                text: '禁用',
+                                color: 'danger',
+                            }
+                        }
+                    }
+                },
                 {action: 'edit', text: '编辑', color: 'info'},
-                {action: 'delete', text: '删除', color: 'danger'},
             ]
         });
+        table.on('tool', function (action, item, index, handler) {
+            if (action === 'active') {
+                var newState = (item.state === 0 || item.state === 2) ? 1 : 2;
+                Utils.apiPost('api/user/updateState', {
+                    id: item.id,
+                    state: newState,
+                }).done(function (res) {
+                    if (!res || res.status !== 0) {
+                        Utils.tipBox(res.msg);
+                        return;
+                    }
+                    handler.update({state: newState})
+                });
+            }
+        })
     })();
 </script>
