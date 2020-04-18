@@ -2,9 +2,8 @@
     <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3">
         <h1 class="h2" page-id="title"></h1>
         <div class="btn-toolbar mb-2 mb-md-0">
-            <div class="btn-group mr-2">
-                <button type="button" class="btn btn-sm btn-outline-info">添加</button>
-                <button type="button" class="btn btn-sm btn-outline-danger">删除</button>
+            <div class="btn-group mr-2" page-id="toolbar">
+
             </div>
         </div>
     </div>
@@ -38,23 +37,35 @@
                 this.perPage = conf.perPage || 10;
                 this.columns = conf.columns || [];
                 this.rowOp = conf.rowOp || [];
+                this.toolbar = conf.toolbar || [];
                 this._events = {};
             },
             created: function () {
+                this.loadToolbar();
                 this.configTable();
+                this.bindEvent();
                 this.loadTable();
             },
             on: function (evtName, callback) {
                 if (typeof callback === 'function') this._events[evtName] = callback;
             },
-            configTable: function () {
+            loadToolbar: function () {
                 var that = this;
-                var htr = this.$elem.find('table thead tr');
-                htr.html('<th></th>');
-                for (var i = 0; i < this.columns.length; i++) {
-                    htr.append('<th>' + this.columns[i].text + '</th>');
+                var toolbar = this.toolbar;
+                var $toolbar = this.$elem.find('[page-id="toolbar"]');
+                for (var k = 0; k < toolbar.length; k++) {
+                    $toolbar.append('<button type="button" class="btn btn-sm btn-outline-' + (toolbar[k].color || 'secondary') + '" data-action="' + toolbar[k].action + '">' + toolbar[k].text + '</button>');
                 }
-                htr.append('<th>操作</th>');
+                $toolbar.on('click', '[data-action]', function () {
+                    var action = $(this).data('action');
+                    if (typeof that._events['toolbar'] === 'function') {
+                        var res = that._events['toolbar'](action);
+                        if (res === false) return;
+                    }
+                });
+            },
+            bindEvent: function () {
+                var that = this;
                 var $pager = this.$elem.find('[page-id="pager"]');
                 $pager.on('click', 'a', function () {
                     var clickPage = Number.parseInt($(this).data('page'));
@@ -79,6 +90,14 @@
                         that.loadTable();
                     }
                 });
+            },
+            configTable: function () {
+                var htr = this.$elem.find('table thead tr');
+                htr.html('<th></th>');
+                for (var i = 0; i < this.columns.length; i++) {
+                    htr.append('<th>' + this.columns[i].text + '</th>');
+                }
+                htr.append('<th>操作</th>');
             },
             buildRow: function (item) {
                 var that = this;
