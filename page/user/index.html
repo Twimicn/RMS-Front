@@ -4,17 +4,6 @@
 </template>
 <script use-widget="table">
     (function () {
-        var ROLES = {
-            0: '<span class="badge badge-dark">普通用户</span>',
-            1: '<span class="badge badge-primary">管理员</span>',
-            2: '<span class="badge badge-light">学生</span>',
-            3: '<span class="badge badge-info">教师</span>',
-        };
-        var STATE = {
-            0: '<span class="badge badge-secondary">未激活</span>',
-            1: '<span class="badge badge-success">已激活</span>',
-            2: '<span class="badge badge-warning">禁用</span>',
-        };
         var table = $.Eira.widget('#table', 'table', {
             title: '用户管理',
             mod: 'user',
@@ -26,12 +15,12 @@
                 {column: 'phone', text: '手机'},
                 {
                     column: 'roleId', text: '角色', tpl: function (data) {
-                        return ROLES[data.roleId];
+                        return Constant.USER_ROLES[data.roleId];
                     }
                 },
                 {
                     column: 'state', text: '状态', tpl: function (data) {
-                        return STATE[data.state];
+                        return Constant.USER_STATE[data.state];
                     }
                 },
             ],
@@ -55,7 +44,7 @@
                     }
                 },
                 {action: 'edit', text: '编辑', color: 'info'},
-            ]
+            ],
         });
         table.on('tool', function (action, item, index, handler) {
             if (action === 'active') {
