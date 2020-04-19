@@ -1,0 +1,26 @@
+<title>项目管理</title>
+<template>
+    <div id="table"></div>
+</template>
+<script use-widget="table">
+    (function () {
+        var STATE = {
+            0: '<span class="badge badge-secondary">未激活</span>',
+            1: '<span class="badge badge-success">已激活</span>',
+            2: '<span class="badge badge-warning">禁用</span>',
+        };
+        var table = $.Eira.widget('#table', 'table', {
+            title: '项目管理',
+            mod: 'project',
+            columns: [
+                {column: 'id', text: 'ID'},
+                {column: 'name', text: '项目名'},
+                {
+                    column: 'state', text: '状态', tpl: function (data) {
+                        return STATE[data.state];
+                    }
+                },
+            ],
+        });
+    })();
+</script>
