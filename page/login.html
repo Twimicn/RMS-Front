@@ -58,7 +58,7 @@
     (function () {
         $('#site_name').html($.Eira.data('siteName'));
         $('#login_form').submit(function () {
-            var tipBox = Utils.loadingBox('登录中...');
+            var loadingBox = Utils.loadingBox('登录中...');
             $(this).ajaxSubmit({
                 url: $.Eira.data('apiUrl') + 'api/user/login',
                 dataType: 'json',
@@ -69,7 +69,10 @@
                         $.Eira.storage('user', res.data);
                         $.Eira.navigate('index')
                     }
-                    tipBox.hide();
+                    loadingBox.hide();
+                }, error: function () {
+                    loadingBox.hide();
+                    Utils.tipBox('服务器发生了一些错误');
                 }
             });
             return false;

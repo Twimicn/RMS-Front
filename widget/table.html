@@ -180,10 +180,12 @@
                 var $elem = this.$elem;
                 var tb = $elem.find('table tbody');
                 tb.empty();
+                var loadingBox = Utils.loadingBox('加载中...');
                 Utils.apiPost('api/' + this.mod + '/list', {
                     page: this.curPage,
                     size: this.perPage,
                 }).done(function (res) {
+                    loadingBox.hide();
                     if (!res || res.status !== 0) {
                         Utils.tipBox(res.msg);
                         return;
@@ -194,6 +196,9 @@
                         tb.append(that.buildRow(dataList[i]));
                     }
                     that.buildPager(res.data.page, res.data.total);
+                }).fail(function () {
+                    loadingBox.hide();
+                    Utils.tipBox('服务器发生了一些错误');
                 });
             },
         });
