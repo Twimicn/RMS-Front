@@ -100,9 +100,23 @@
         $('#nav_site_name').text($.Eira.data('siteName'));
         var user = $.Eira.storage('user');
         if (user.token) {
-            $('#nav_user').text(user.username);
+            $('#nav_user').text(user.name || user.username);
         }
-        var navs = $.Eira.data('leftNav');
+        var navs = [];
+        if (user.roleId === 1) {
+            navs = [
+                {title: '首页', mod: 'index',},
+                {title: '用户管理', mod: 'user',},
+                {title: '项目管理', mod: 'project',},
+                {title: '资源管理', mod: 'resource',},
+            ];
+        } else {
+            navs = [
+                {title: '首页', mod: 'index',},
+                {title: '我的项目', mod: 'project', link: '#?mod=project&action=mine',},
+                {title: '我的资源', mod: 'resource', link: '#?mod=resource&action=mine',},
+            ];
+        }
         var leftNav = $('#left_nav ul');
         leftNav.empty();
         for (var i = 0; i < navs.length; i++) {
