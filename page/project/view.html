@@ -1,0 +1,40 @@
+<template>
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3">
+        <h1 class="h2">项目详情</h1>
+    </div>
+    <div class="card" style="width: 18rem;">
+        <div class="card-body">
+            <h5 class="card-title">项目名称:测试项目</h5>
+            <p class="card-text">项目状态:<span class="badge badge-secondary">立项</span></p>
+        </div>
+    </div>
+    <div id="table"></div>
+</template>
+<script use-widget="table">
+    (function () {
+        var router = $.Eira.router();
+        var table = $.Eira.widget('#table', 'table', {
+            title: '项目成员',
+            mod: 'project',
+            action: 'userList',
+            data: {
+                projectId: router.query.id,
+            },
+            columns: [
+                {column: 'id', text: 'ID'},
+                {column: 'username', text: '学号/工号'},
+                {column: 'name', text: '姓名'},
+                {
+                    column: 'roleId', text: '角色', tpl: function (data) {
+                        return Constant.USER_ROLES[data.roleId];
+                    }
+                },
+                {
+                    column: 'role', text: '项目内角色', tpl: function (data) {
+                        return Constant.IN_PROJECT_ROLES[data.role];
+                    }
+                },
+            ],
+        });
+    })();
+</script>

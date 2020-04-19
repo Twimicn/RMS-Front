@@ -1,15 +1,24 @@
-<title>项目管理</title>
+<title>我的项目</title>
 <template>
     <div id="table"></div>
 </template>
 <script use-widget="table">
     (function () {
         var table = $.Eira.widget('#table', 'table', {
-            title: '项目管理',
+            title: '我的项目',
             mod: 'project',
+            action: 'mine',
+            data: {
+                userId: $.Eira.storage('user').id,
+            },
             columns: [
                 {column: 'id', text: 'ID'},
                 {column: 'name', text: '项目名'},
+                {
+                    column: 'role', text: '项目内角色', tpl: function (data) {
+                        return Constant.IN_PROJECT_ROLES[data.role];
+                    }
+                },
                 {
                     column: 'state', text: '状态', tpl: function (data) {
                         return Constant.PROJECT_STATE[data.state];
