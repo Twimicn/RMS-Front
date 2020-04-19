@@ -33,6 +33,8 @@
                 $elem.find('[page-id="title"]').text(conf.title || '无标题');
                 this.pk = conf.primaryKey || 'id';
                 this.mod = conf.mod;
+                this.action = conf.action || 'list';
+                this.data = conf.data || {};
                 this.curPage = conf.curPage || 1;
                 this.perPage = conf.perPage || 10;
                 this.columns = conf.columns || [];
@@ -175,16 +177,16 @@
                 }
                 $pager.append('<li class="page-item"><a aria-label="Next" class="page-link" data-page="next"><span aria-hidden="true">»</span><span class="sr-only">下一页</span></a></li><li class="page-item"><a class="page-link" data-page="last">尾页</a></li>');
             },
-            loadTable: function () {
+            loadTable: function (extraData) {
                 var that = this;
                 var $elem = this.$elem;
                 var tb = $elem.find('table tbody');
                 tb.empty();
                 var loadingBox = Utils.loadingBox('加载中...');
-                Utils.apiPost('api/' + this.mod + '/list', {
+                Utils.apiPost('api/' + this.mod + '/' + this.action, $.extend({
                     page: this.curPage,
                     size: this.perPage,
-                }).done(function (res) {
+                }, this.data, extraData)).done(function (res) {
                     loadingBox.hide();
                     if (!res || res.status !== 0) {
                         Utils.tipBox(res.msg);
