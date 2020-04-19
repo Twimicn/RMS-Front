@@ -25,13 +25,14 @@
                 var $form = this.$elem.find('[page-id="form"]');
                 $form.empty();
                 for (var i = 0; i < columns.length; i++) {
+                    var required = columns[i].required ? ' required' : '';
                     var item = '<div class="form-group"><label for="' + columns[i].column + '">' + columns[i].text + '</label>';
                     switch (columns[i].type) {
                         case 'textarea':
-                            item += '<textarea class="form-control" id="' + columns[i].column + '" name="' + columns[i].column + '"></textarea>';
+                            item += '<textarea class="form-control" id="' + columns[i].column + '" name="' + columns[i].column + '"' + required + '></textarea>';
                             break;
                         case 'select':
-                            item += '<select class="form-control" id="' + columns[i].column + '" name="' + columns[i].column + '">';
+                            item += '<select class="form-control" id="' + columns[i].column + '" name="' + columns[i].column + '"' + required + '>';
                             var sOptions = columns[i].options;
                             if (sOptions) {
                                 for (var si = 0; si < sOptions.length; si++) {
@@ -41,7 +42,7 @@
                             item += '</select>';
                             break;
                         default:
-                            item += '<input type="text" class="form-control" id="' + columns[i].column + '" name="' + columns[i].column + '"  placeholder="' + columns[i].text + '"/>';
+                            item += '<input type="text" class="form-control" id="' + columns[i].column + '" name="' + columns[i].column + '"  placeholder="' + columns[i].text + '"' + required + '/>';
                             break;
                     }
                     item += '</div>';
