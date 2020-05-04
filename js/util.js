@@ -69,7 +69,6 @@
     };
 
     Dialog.prototype.on = function (evtName, callback) {
-        console.log(evtName, callback);
         if (typeof callback === 'function') this._events[evtName] = callback;
     };
 
@@ -94,6 +93,25 @@
             body: msg,
             ok: '确定',
             cancel: '取消',
+        });
+        dialog.show();
+        return dialog;
+    }
+
+    function inputBox(title, msg) {
+        var inputId = 'input_box_' + (new Date()).getTime();
+        var dialog = new Dialog('msg', {
+            header: {
+                title: title,
+                close: true,
+            },
+            body: '<p>' + msg + '</p>' + '<input id="' + inputId + '" type="text" class="form-control"/>',
+            ok: '确定',
+            cancel: '取消',
+        });
+        dialog.on('ok', function () {
+            dialog.hide();
+            if (typeof dialog._events['input'] === 'function') dialog._events['input']($('#' + inputId).val());
         });
         dialog.show();
         return dialog;
@@ -145,6 +163,7 @@
     W.Utils = {
         showAlert: showAlert,
         messageBox: messageBox,
+        inputBox: inputBox,
         loadingBox: loadingBox,
         tipBox: tipBox,
         createDialog: createDialog,
