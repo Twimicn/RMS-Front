@@ -4,8 +4,8 @@
     </div>
     <div class="card" style="width: 18rem;">
         <div class="card-body">
-            <h5 class="card-title">项目名称:测试项目</h5>
-            <p class="card-text">项目状态:<span class="badge badge-secondary">立项</span></p>
+            <h5 class="card-title">项目名称:<span id="project_name"></span></h5>
+            <p id="project_state" class="card-text">项目状态:</p>
         </div>
     </div>
     <div id="table"></div>
@@ -13,6 +13,16 @@
 <script use-widget="table">
     (function () {
         var router = $.Eira.router();
+        Utils.apiPost('api/project/view', {
+            projectId: router.query.id,
+        }).done(function (res) {
+            if (!res || res.status !== 0) {
+                Utils.tipBox(res.msg);
+                return;
+            }
+            $('#project_name').text(res.data.name);
+            $('#project_state').html('项目状态:' + Constant.PROJECT_STATE[res.data.state]);
+        });
         var table = $.Eira.widget('#table', 'table', {
             title: '项目成员',
             mod: 'project',
@@ -39,7 +49,30 @@
                 {action: 'add', color: 'success', text: '添加成员'},
             ],
             rowOp: [
-                {action: 'remove', text: '移除成员', color: 'danger'},
+                {
+                    action: 'update', tpl: function (item) {
+                        if (item.role === 0) {
+                            return {
+                                text: '设为负责人',
+                                color: 'primary',
+                            }
+                        } else if (item.role === 1) {
+                            return {
+                                text: '取消负责人',
+                                color: 'warning',
+                            }
+                        }
+                    }
+                },
+                {
+                    action: 'remove', tpl: function (item) {
+                        if (item.role !== 2) {
+                            return {
+                                text: '移除成员', color: 'danger'
+                            }
+                        }
+                    }
+                },
             ],
         });
         table.on('tool', function (action, item, index, handler) {
@@ -60,10 +93,39 @@
                     });
                     dialog.hide();
                 });
+            } else if (action === 'update') {
+                var newRole = (item.role === 1) ? 0 : 1;
+                Utils.apiPost('api/project/editMember', {
+                    userId: item.id,
+                    projectId: router.query.id,
+                    role: newRole,
+                }).done(function (res) {
+                    if (!res || res.status !== 0) {
+                        Utils.tipBox(res.msg);
+                        return;
+                    }
+                    handler.update({role: newRole})
+                });
             }
         });
         table.on('toolbar', function (action) {
-
+            if (action === 'add') {
+                var inputBox = Utils.inputBox('添加成员', '请输入成员的ID');
+                inputBox.on('input', function (text) {
+                    var data = {
+                        userId: text,
+                        projectId: router.query.id,
+                        role: 0,
+                    };
+                    Utils.apiPost('api/project/addMember', data).done(function (res) {
+                        if (!res || res.status !== 0) {
+                            Utils.tipBox(res.msg);
+                            return;
+                        }
+                        table.loadTable();
+                    });
+                })
+            }
         });
     })();
 </script>
