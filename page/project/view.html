@@ -35,6 +35,35 @@
                     }
                 },
             ],
+            toolbar: [
+                {action: 'add', color: 'success', text: '添加成员'},
+            ],
+            rowOp: [
+                {action: 'remove', text: '移除成员', color: 'danger'},
+            ],
+        });
+        table.on('tool', function (action, item, index, handler) {
+            if (action === 'remove') {
+                var dialog = Utils.messageBox('提示', '是否从项目中移除成员');
+                dialog.on('ok', function () {
+                    var data = {
+                        userId: item.id,
+                        projectId: router.query.id,
+                    };
+                    Utils.apiPost('api/project/removeMember', data).done(function (res) {
+                        if (!res || res.status !== 0) {
+                            Utils.tipBox(res.msg);
+                            return;
+                        }
+                        Utils.tipBox('删除成功');
+                        handler.remove();
+                    });
+                    dialog.hide();
+                });
+            }
+        });
+        table.on('toolbar', function (action) {
+           
         });
     })();
 </script>
