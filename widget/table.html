@@ -119,11 +119,13 @@
                     }
                     var ops = '<td><div class="btn-group">';
                     for (var k = 0; k < rowOp.length; k++) {
+                        var curRowOp = {};
+                        $.extend(curRowOp, rowOp[k]);
                         if (typeof rowOp[k].tpl === 'function') {
-                            $.extend(rowOp[k], rowOp[k].tpl(item));
+                            $.extend(curRowOp, rowOp[k].tpl(item));
                         }
-                        if (rowOp[k].text) {
-                            ops += ('<button type="button" class="btn btn-sm btn-outline-' + (rowOp[k].color || 'secondary') + '" data-action="' + rowOp[k].action + '">' + rowOp[k].text + '</button>');
+                        if (curRowOp.text) {
+                            ops += ('<button type="button" class="btn btn-sm btn-outline-' + (curRowOp.color || 'secondary') + '" data-action="' + curRowOp.action + '">' + curRowOp.text + '</button>');
                         }
                     }
                     tr += ops + '</div></td>';
