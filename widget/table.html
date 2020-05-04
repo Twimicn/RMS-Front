@@ -151,7 +151,7 @@
                         dialog.on('ok', function () {
                             var data = {};
                             data[that.pk] = that.tableData[index][that.pk];
-                            Utils.apiPost('api/' + this.mod + '/list', data).done(function () {
+                            Utils.apiPost('api/' + this.mod + '/delete', data).done(function (res) {
                                 if (!res || res.status !== 0) {
                                     Utils.tipBox(res.msg);
                                     return;
