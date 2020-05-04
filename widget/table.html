@@ -122,7 +122,9 @@
                         if (typeof rowOp[k].tpl === 'function') {
                             $.extend(rowOp[k], rowOp[k].tpl(item));
                         }
-                        ops += ('<button type="button" class="btn btn-sm btn-outline-' + (rowOp[k].color || 'secondary') + '" data-action="' + rowOp[k].action + '">' + rowOp[k].text + '</button>');
+                        if (rowOp[k].text) {
+                            ops += ('<button type="button" class="btn btn-sm btn-outline-' + (rowOp[k].color || 'secondary') + '" data-action="' + rowOp[k].action + '">' + rowOp[k].text + '</button>');
+                        }
                     }
                     tr += ops + '</div></td>';
                     return tr;
