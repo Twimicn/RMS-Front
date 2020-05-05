@@ -13,6 +13,8 @@
 <script use-widget="table">
     (function () {
         var router = $.Eira.router();
+        var user = $.Eira.storage('user');
+        var canManage = user.roleId === 1 || user.roleId === 3 || user.roleId === 4;
         Utils.apiPost('api/project/view', {
             projectId: router.query.id,
         }).done(function (res) {
@@ -51,24 +53,28 @@
             rowOp: [
                 {
                     action: 'update', tpl: function (item) {
-                        if (item.role === 0) {
-                            return {
-                                text: '设为负责人',
-                                color: 'primary',
-                            }
-                        } else if (item.role === 1) {
-                            return {
-                                text: '取消负责人',
-                                color: 'warning',
+                        if (canManage) {
+                            if (item.role === 0) {
+                                return {
+                                    text: '设为负责人',
+                                    color: 'primary',
+                                }
+                            } else if (item.role === 1) {
+                                return {
+                                    text: '取消负责人',
+                                    color: 'warning',
+                                }
                             }
                         }
                     }
                 },
                 {
                     action: 'remove', tpl: function (item) {
-                        if (item.role !== 2) {
-                            return {
-                                text: '移除成员', color: 'danger'
+                        if (canManage) {
+                            if (item.role !== 2) {
+                                return {
+                                    text: '移除成员', color: 'danger'
+                                }
                             }
                         }
                     }

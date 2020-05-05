@@ -16,6 +16,9 @@
                     }
                 },
             ],
+            toolbar: [
+                {action: 'add', color: 'success', text: '新建项目'},
+            ],
             rowOp: [
                 {action: 'view', text: '查看', color: 'info'},
             ],
@@ -27,6 +30,27 @@
                     action: 'view',
                     id: item.id,
                 })
+            }
+        });
+        table.on('toolbar', function (action) {
+            if (action === 'add') {
+                var inputBox = Utils.inputBox('新建项目', '请输入项目名称');
+                inputBox.on('input', function (text) {
+                    var data = {
+                        name: text,
+                    };
+                    Utils.apiPost('api/project/create', data).done(function (res) {
+                        if (!res || res.status !== 0) {
+                            Utils.tipBox(res.msg);
+                            return;
+                        }
+                        $.Eira.navigate('', {
+                            mod: 'project',
+                            action: 'view',
+                            id: res.data,
+                        });
+                    });
+                });
             }
         });
     })();
