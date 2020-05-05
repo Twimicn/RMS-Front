@@ -99,7 +99,7 @@
                 for (var i = 0; i < this.columns.length; i++) {
                     htr.append('<th>' + this.columns[i].text + '</th>');
                 }
-                if (this.rowOp) {
+                if (this.rowOp.length > 0) {
                     htr.append('<th>操作</th>');
                 }
             },
