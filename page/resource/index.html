@@ -1,0 +1,30 @@
+<title>资源管理</title>
+<template>
+    <div id="table"></div>
+</template>
+<script use-widget="table">
+    (function () {
+        var table = $.Eira.widget('#table', 'table', {
+            title: '资源管理',
+            mod: 'resource',
+            columns: [
+                {column: 'id', text: 'ID'},
+                {column: 'name', text: '文件名'},
+                {column: 'storage', text: '路径'},
+                {column: 'memo', text: '备注'},
+            ],
+            rowOp: [
+                {action: 'view', text: '查看', color: 'info'},
+            ],
+        });
+        table.on('tool', function (action, item, index, handler) {
+            if (action === 'view') {
+                $.Eira.navigate('', {
+                    mod: 'resource',
+                    action: 'view',
+                    id: item.id,
+                })
+            }
+        });
+    })();
+</script>
