@@ -8,7 +8,9 @@
             <p id="project_state" class="card-text">项目状态:</p>
         </div>
     </div>
-    <div id="table"></div>
+    <input id="res_file" type="file" style="display: none;">
+    <div id="userTable"></div>
+    <div id="resTable"></div>
 </template>
 <script use-widget="table">
     (function () {
@@ -25,7 +27,7 @@
             $('#project_name').text(res.data.name);
             $('#project_state').html('项目状态:' + Constant.PROJECT_STATE[res.data.state]);
         });
-        var table = $.Eira.widget('#table', 'table', {
+        var userTable = $.Eira.widget('#userTable', 'table', {
             title: '项目成员',
             mod: 'project',
             action: 'userList',
@@ -81,7 +83,30 @@
                 },
             ],
         });
-        table.on('tool', function (action, item, index, handler) {
+        var resTable = $.Eira.widget('#resTable', 'table', {
+            title: '项目资源',
+            mod: 'project',
+            action: 'resList',
+            data: {
+                projectId: router.query.id,
+            },
+            columns: [
+                {column: 'id', text: 'ID'},
+                {column: 'name', text: '文件名'},
+                {column: 'memo', text: '备注'},
+                {column: 'userName', text: '上传者'},
+                {
+                    column: 'state', text: '下载链接', tpl: function (data) {
+                        return '<a href="' + data.link + '" download="' + data.name + '">下载</a>';
+                    }
+                },
+            ],
+            toolbar: [
+                {action: 'add', color: 'success', text: '上传资源'},
+            ],
+            rowOp: [],
+        });
+        userTable.on('tool', function (action, item, index, handler) {
             if (action === 'remove') {
                 var dialog = Utils.messageBox('提示', '是否从项目中移除成员');
                 dialog.on('ok', function () {
@@ -114,7 +139,7 @@
                 });
             }
         });
-        table.on('toolbar', function (action) {
+        userTable.on('toolbar', function (action) {
             if (action === 'add') {
                 var inputBox = Utils.inputBox('添加成员', '请输入成员的ID');
                 inputBox.on('input', function (text) {
@@ -128,10 +153,29 @@
                             Utils.tipBox(res.msg);
                             return;
                         }
-                        table.loadTable();
+                        userTable.loadTable();
                     });
                 })
             }
+        });
+        resTable.on('toolbar', function (action) {
+            if (action === 'add') {
+                $("#res_file").click();
+            }
+        });
+        $("#res_file").change(function () {
+            var loadingBox = Utils.loadingBox('上传中...');
+            Utils.apiUpload('/api/resource/upload', {
+                projectId: router.query.id,
+                file: $(this)[0].files[0],
+            }).done(function (res) {
+                if (!res || res.status !== 0) {
+                    Utils.tipBox(res.msg);
+                    return;
+                }
+                resTable.loadTable();
+                loadingBox.hide();
+            })
         });
     })();
 </script>
