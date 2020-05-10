@@ -160,6 +160,22 @@
         });
     }
 
+    function apiUpload(path, data) {
+        var postData = new FormData();
+        $.each(data, function (k, v) {
+            postData.append(k, v);
+        });
+        postData.append('token', $.Eira.storage('user').token);
+        return $.ajax({
+            url: $.Eira.data('apiUrl') + path,
+            method: "POST",
+            timeout: 0,
+            processData: false,
+            contentType: false,
+            data: postData,
+        });
+    }
+
     W.Utils = {
         showAlert: showAlert,
         messageBox: messageBox,
@@ -168,6 +184,7 @@
         tipBox: tipBox,
         createDialog: createDialog,
         checkLogin: checkLogin,
+        apiUpload: apiUpload,
         apiPost: apiPost,
         logout: logout,
     }
