@@ -1,12 +1,13 @@
-<title>资源管理</title>
+<title>我的资源</title>
 <template>
     <div id="table"></div>
 </template>
 <script use-widget="table">
     (function () {
         var table = $.Eira.widget('#table', 'table', {
-            title: '资源管理',
+            title: '我的资源',
             mod: 'resource',
+            action: 'mine',
             columns: [
                 {column: 'id', text: 'ID'},
                 {column: 'name', text: '文件名'},
