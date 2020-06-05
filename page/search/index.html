@@ -1,0 +1,105 @@
+<title>检索</title>
+<template>
+    <div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3">
+        <h1 class="h2">检索</h1>
+    </div>
+    <div class="card">
+        <div class="card-body">
+            <form class="mt-2 mb-2 row">
+                <div class="input-group mb-3 col-lg-6">
+                    <input id="word" name="word" class="form-control" type="text" placeholder="搜索" aria-label="搜索"
+                           value="">
+                    <div class="input-group-append">
+                        <button id="search" type="button" class="btn btn-primary">搜索</button>
+                    </div>
+                </div>
+                <div class="input-group mt-1 ml-4">
+                    <div class="custom-control custom-radio custom-control-inline">
+                        <input type="radio" id="crProject" name="origin"
+                               class="custom-control-input" value="project" checked>
+                        <label class="custom-control-label" for="crProject">项目</label>
+                    </div>
+                    <div class="custom-control custom-radio custom-control-inline">
+                        <input type="radio" id="crResource" value="resource" name="origin"
+                               class="custom-control-input">
+                        <label class="custom-control-label" for="crResource">资源</label>
+                    </div>
+                    <div class="custom-control custom-radio custom-control-inline">
+                        <input type="radio" id="crUser" value="user" name="origin"
+                               class="custom-control-input">
+                        <label class="custom-control-label" for="crUser">用户</label>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+    <div id="table"></div>
+</template>
+<script use-widget="table">
+    (function () {
+        var table;
+        var COLUMNS = {
+            'resource': [
+                {column: 'id', text: 'ID'},
+                {column: 'name', text: '文件名'},
+                {column: 'storage', text: '路径'},
+                {column: 'memo', text: '备注'},
+                {
+                    column: 'download', text: '下载链接', tpl: function (data) {
+                        return '<a role="button" class="btn btn-sm btn-outline-info" href="' + data.link + '" download="' + data.name + '">查看</a>';
+                    }
+                },
+            ],
+            'project': [
+                {column: 'id', text: 'ID'},
+                {column: 'name', text: '项目名'},
+                {
+                    column: 'state', text: '状态', tpl: function (data) {
+                        return Constant.PROJECT_STATE[data.state];
+                    }
+                },
+                {
+                    column: 'download', text: '操作', tpl: function (data) {
+                        return '<a role="button" class="btn btn-sm btn-outline-info" href="#?mod=project&action=view&id=' + data.id + '">查看</a>';
+                    }
+                },
+            ],
+            'user': [
+                {column: 'id', text: 'ID'},
+                {column: 'username', text: '学号/工号'},
+                {column: 'name', text: '姓名'},
+                {column: 'email', text: '邮箱'},
+                {column: 'phone', text: '手机'},
+                {
+                    column: 'roleId', text: '角色', tpl: function (data) {
+                        return Constant.USER_ROLES[data.roleId];
+                    }
+                },
+                {
+                    column: 'state', text: '状态', tpl: function (data) {
+                        return Constant.USER_STATE[data.state];
+                    }
+                },
+                {
+                    column: 'download', text: '操作', tpl: function (data) {
+                        return '<a role="button" class="btn btn-sm btn-outline-info" href="#?mod=project&action=their&id=' + data.id + '">Ta的项目</a>';
+                    }
+                },
+            ],
+        };
+        $('#search').click(function () {
+            var word = $('#word').val();
+            var mod = $('[name="origin"]:checked').val();
+            if (!word) return;
+            table = $.Eira.widget('#table', 'table', {
+                title: '检索结果',
+                mod: mod,
+                action: 'search',
+                data: {
+                    word: word,
+                },
+                columns: COLUMNS[mod],
+            });
+        });
+    })();
+</script>

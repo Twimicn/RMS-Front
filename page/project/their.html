@@ -1,0 +1,43 @@
+<title>Ta的项目</title>
+<template>
+    <div id="table"></div>
+</template>
+<script use-widget="table">
+    (function () {
+        var router = $.Eira.router();
+        var table = $.Eira.widget('#table', 'table', {
+            title: 'Ta的项目',
+            mod: 'project',
+            action: 'their',
+            data: {
+                id: router.query.id,
+            },
+            columns: [
+                {column: 'id', text: 'ID'},
+                {column: 'name', text: '项目名'},
+                {
+                    column: 'role', text: '项目内角色', tpl: function (data) {
+                        return Constant.IN_PROJECT_ROLES[data.role];
+                    }
+                },
+                {
+                    column: 'state', text: '状态', tpl: function (data) {
+                        return Constant.PROJECT_STATE[data.state];
+                    }
+                },
+            ],
+            rowOp: [
+                {action: 'view', text: '查看', color: 'info'},
+            ],
+        });
+        table.on('tool', function (action, item, index, handler) {
+            if (action === 'view') {
+                $.Eira.navigate('', {
+                    mod: 'project',
+                    action: 'view',
+                    id: item.id,
+                })
+            }
+        });
+    })();
+</script>
