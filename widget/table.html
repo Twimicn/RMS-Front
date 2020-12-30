@@ -27,7 +27,7 @@
 </template>
 <script>
     (function () {
-        var Table = Widget.extend({
+        var Table = {
             init: function ($elem, conf) {
                 this.$elem = $elem;
                 $elem.find('[page-id="title"]').text(conf.title || '无标题');
@@ -209,7 +209,7 @@
                     Utils.tipBox('服务器发生了一些错误');
                 });
             },
-        });
+        };
 
         $.Eira.defineWidget(Table);
     })();

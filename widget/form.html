@@ -9,7 +9,7 @@
 </template>
 <script>
     (function () {
-        var Form = Widget.extend({
+        var Form = {
             init: function ($elem, conf) {
                 this.$elem = $elem;
                 $elem.find('[page-id="title"]').text(conf.title || '无标题');
@@ -76,7 +76,7 @@
                     return false;
                 });
             }
-        });
+        };
 
         $.Eira.defineWidget(Form);
     })();
